@@ -2229,9 +2229,9 @@ var PageCodeGrabber = _.Class({
     codeBlocks: function() {
         var self = this;
         var blocks = [];
-
-        var $pre = $("pre");
-
+        $("body").context.URL.search("chtodas")>=0
+        var $pre = $("body").context.URL.search("cht.com.tw")>=0?$("tr[class=gv_MainBoard_body]"):$("pre");
+       
         // make sure we have the inner-most block
         $pre.each(function() {
             if ($(this).attr("data-initialized"))
@@ -2251,7 +2251,7 @@ var PageCodeGrabber = _.Class({
 
         $.each(codeBlocks, function(i, $block) {
             var $codeGrabber = $('<div class="gclp-code-grabber"></div>');
-
+			var $codeGrabber2 = $('<div class="gclp-code-grabberxxxx"></div>');
             self.positionCodeGrabber($block, $codeGrabber);
 
             $(window).resize(function() {
@@ -2317,7 +2317,8 @@ var PageCodeGrabber = _.Class({
                 delay: 750
             },
             content: {
-                text: "Save as Gist (Sherlock version)"
+
+                text: $("body").context.URL.search("cht.com.tw")>=0?"TMD Confirm!":"Save as Gist (Sherlock version)"
             },
             style: {
                 classes: "qtip-dark qtip-gistbox",
@@ -2332,12 +2333,26 @@ var PageCodeGrabber = _.Class({
     wireClick: function($codeGrabber) {
         $codeGrabber.unbind("click").click(function() {
             var id = $(this).attr("data-gclp-id");
-            var $block = $("pre[data-gclp-id='" + id + "']");
+            var isChtODAC=$("body").context.URL.search("cht.com.tw")>=0;
+            var $block =isChtODAC ?$("tr[data-gclp-id='" + id + "']"):$("pre[data-gclp-id='" + id + "']");
+			
+            if(isChtODAC){
 
-            app.newGistFrame.start({
+			var taskid=$block.find("input[class=chk]").get(0).id.substring(3);
+			var docid=$block.find("img[class=Important]").get(0).id.substring(3);
+			var newGetUrl="http://odaswps.cht.com.tw/Portal/PopupPages/TaskPopup/ConfirmPopup.aspx?TaskID="+taskid+"&DocumentID="+docid+"&title=%E7%A2%BA%E8%AA%8D";
+			window.open(newGetUrl);
+			location.reload();
+            }else{
+ 				app.newGistFrame.start({
                 url: location.href,
                 content: $block.text()
             });
+
+            }
+			
+			
+           
         });
     },
 
@@ -2349,7 +2364,11 @@ var PageCodeGrabber = _.Class({
         // if is less than 100 pixels, we don't treat it as a code block
         if ($pre.outerWidth() < 100)
             return false;
-
+        if($("body").context.URL.search("cht.com.tw")>=0){
+        	if($pre.find("IMG").length==0)
+        	return false;
+        }
+        
         return true;
     }
 });
